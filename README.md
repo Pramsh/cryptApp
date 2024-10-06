@@ -1,3 +1,5 @@
+### Not finished yet
+
 The purpose of this service is to isolate the cypher logic into a single serveer.
 
 
@@ -59,13 +61,6 @@ These keys are saved onto the DB associated with the user's ID. Private key is A
 
 #### Endpoint to sign data
 This endpoint is usefull to combine document's hash with the private key of the user.
-
-
-
-
-Lato client non può essere esposto un enpoint per decriptare. Se passo lo sha256 dello userId ho bisogno.
-
-Se espongo un servizio eper decriptare, chiunque abbia un messaggio cryptato può usare il servizio per decriptarlo.
 
 
 ##### Postgres testing setup
