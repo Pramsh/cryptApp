@@ -1,0 +1,6 @@
+.env
+node_modules
+doc copy.dio
+doc.dio
+sign_approve.dio
+user-table.sql
