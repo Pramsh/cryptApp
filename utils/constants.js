@@ -1,3 +1,5 @@
+export const userPermissions = ["admin", "user"]
+
 export const signDocumentsPermissions = ["admin"]
 
 export const JWTexpirationTimeValue = 60 * 60 //1h
@@ -9,3 +11,5 @@ export const IPheader = 'x-forwarded-for'
 
 export const dbHashedFields = ["jwtprivateencryptedkey","documentpublickey", "applicantsignature", "managersignature"]
 
+//client rules
+export const clientForbiddenFields = ["jwtPrivateKey"]

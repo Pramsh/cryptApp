@@ -1,7 +1,8 @@
-import { getUsersIds } from "../../lib/DB";
+import { getUsers } from "../../lib/DB";
 import DecryptUserData from "../../middlewares/DecryptUserData"
 import EncryptUserData from "../../middlewares/EncryptUserData"
 import RSA_Gen from "../../middlewares/RSA_Gen"
+import { signDocumentsPermissions, userPermissions } from "../../utils/constants";
 import {
     testEncryptDecryptStr,
     testEncryptDecryptObject,
@@ -84,14 +85,43 @@ describe("Cypher", () => {
 
 
 describe("RSA", () => {
-    describe("Generates RSA for asynchrouns operations", () => {
+    describe("Generates RSA for asymmetric signatures for all users", () => {
+        jest.setTimeout(30000); // Increase timeout to 30 seconds
         it("Returns ok and status 200", async () => {
-            await getUsersIds()
-            const [ id ] = rsa_genMockRes.send.mock.calls[0][0]
-            rsa_genMockReq.id = id
-            await RSA_Gen(rsa_genMockReq, rsa_genMockRes)
-            expect(rsa_genMockRes.send).toHaveBeenCalledWith("ok")
-            expect(rsa_genMockRes.status).toHaveBeenCalledWith(200)
+            const userIds = await getUsers()
+            expect(userIds).toBeInstanceOf(Array);
+            expect(userIds.length).toBeGreaterThan(0);
+            for(let el of userIds){
+                expect(typeof el).toBe('object');
+                rsa_genMockReq.body.userId = el.id
+                await RSA_Gen(rsa_genMockReq, rsa_genMockRes)
+                expect(rsa_genMockRes.send).toHaveBeenCalledWith("ok")
+                expect(rsa_genMockRes.status).toHaveBeenCalledWith(200)
+            }
+        })
+
+        //test to generate one key per each kind of role
+        it("Generates one RSA key per each kind of role", async () => {
+            const userIds = await getUsers()
+            expect(userIds).toBeInstanceOf(Array);
+            expect(userIds.length).toBeGreaterThan(0);
+            const roles = {}
+            for(let el of userIds){
+                expect(typeof el).toBe('object');
+                if(!roles[el.role] && userPermissions.some((permission) => el.role === permission)){
+                    if((signDocumentsPermissions.some((r) => r === el.role) && !el.documentpublickey) || ((!signDocumentsPermissions.some((r) => r === el.role) && !el.documentpublickey && !el.jwtpublickey))){                        
+                        roles[el.role] = true
+                        rsa_genMockReq.body.userId = el.id
+                        await RSA_Gen(rsa_genMockReq, rsa_genMockRes)
+                        expect(rsa_genMockRes.send).toHaveBeenCalledWith("ok")
+                        expect(rsa_genMockRes.status).toHaveBeenCalledWith(200)
+                    }
+                }
+            }
+            //warn if there is not one user tested for each role, but don't error
+            console.log("No available users to test for roles:", userPermissions.filter((role) => !roles[role]).join(", "))
         })
     })
+
+    
 })

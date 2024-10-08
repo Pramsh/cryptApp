@@ -1,8 +1,6 @@
 export default async function RSA_Gen(req, res, next){
     const { userId }= req.body
-     try {
-        console.log(userId, "userId");
-        
+     try {      
         await Cipher.RSAhandleGeneration(userId)
         res.status(200).send("ok")
      } catch (error) {       

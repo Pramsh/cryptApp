@@ -40,3 +40,18 @@ export const divideChunks = (arr, maxLength) => {
         req.headers[IPheader].split(',')[0] :
         req.connection.remoteAddress
   
+
+        export const checkVariables = (variables, flowReference) => {
+            return new Promise((resolve, reject) => {
+                const missingVariables = Object.entries(variables).filter(([key, value]) => value === undefined || value === null || value.trim() === '');
+                if (missingVariables.length > 0) {
+                    const missingKeys = missingVariables.map(([key]) => key);
+                    reject({
+                        message: "Missing variables: " + missingKeys.join(', ') + " -- in flow: " + flowReference,
+                        status: 400
+                    });
+                } else {
+                    resolve();
+                }
+            });
+        };
