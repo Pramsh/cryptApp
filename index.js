@@ -11,6 +11,7 @@ import Test from './middlewares/Tes.js'
 import ValidateJWT from './middlewares/ValidateJWT.js'
 import Authenticate from './middlewares/Authenticate.js'
 import SignDocument from './middlewares/SignDocument.js'
+import { GetSessionMid } from './middlewares/GetSession.js'
 //in partica gli altri server be saranno collegati a questo e passarenno gli header che verrann ocontrollati
 //se non vanno l'app schianta
 //quindi devo esporre un endpoint che valida solo gli header
@@ -31,6 +32,8 @@ router.get('/headers-valid', Authenticate)
 app.all('*', Authentication)
 
 router.get("/test", Test)
+
+router.post("/get-session", GetSessionMid)
 
 router.post("/encrypt", EncryptUserData)
 
