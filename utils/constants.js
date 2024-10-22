@@ -13,3 +13,8 @@ export const dbHashedFields = ["jwtprivateencryptedkey","documentpublickey", "ap
 
 //client rules
 export const clientForbiddenFields = ["jwtPrivateKey"]
+
+
+//query params sets
+export const signDocumentsParams = Object.freeze(["applicant", "manager", "documentsha"])
+export const verifyDocumentParams = Object.freeze(["applicant", "manager","applicantsignature", "documentsha"])

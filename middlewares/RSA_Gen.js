@@ -1,5 +1,5 @@
 import { hasSignDocumentsPermissions } from "../utils/functions.js";
-import { getUserById } from "../lib/DB.js";
+import { getUserById, updateUserById } from "../lib/DB.js";
 
 const storeKeysInDatabase = (userId, jwtpublickey, jwtprivateencryptedkey, documentpublickey, documentprivateencryptedkey) => 
     new Promise(async(resolve, reject) => {
@@ -25,7 +25,7 @@ const storeKeysInDatabase = (userId, jwtpublickey, jwtprivateencryptedkey, docum
             }
 
             if(payload){
-                await updateUserById(userId, storedData)
+                await updateUserById(userId, payload)
             }
             resolve("ok")
         } catch (error) {
@@ -41,7 +41,7 @@ export default async function RSA_Gen(req, res, next){
     const { userId }= req.body
      try {      
         const userData = await getUserById(userId)
-                
+        
         // Skip if user already has both keys
         if( userData.jwtprivateencryptedkey && userData.documentprivateencryptedkey){
             return resolve()
@@ -71,8 +71,10 @@ export default async function RSA_Gen(req, res, next){
         }       
 
         await storeKeysInDatabase(userId, jwtpublickey, jwtprivateencryptedkey, documentpublickey, documentprivateencryptedkey)
-        res.status(200).send("ok")
+        res.status(200).send({message:"ok"})
      } catch (error) {       
+        console.log(error);
+        
          res.status(error?.status ?? 500).send("Error generating RSA keys for userId "+userId+" -- details: "+error.message)
      }
 }

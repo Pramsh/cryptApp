@@ -1,6 +1,7 @@
 import { getClientIP } from "../utils/functions.js"
 import { getDocument, getUserById, updateDocApplicantOrManagerSignature } from "../lib/DB.js";
 import { getSession } from "./GetSession.js";
+import Cipher from "../lib/Cipher.js";
 
 const storeSignedDocument = async(userId, type, applicant, publicKey, dataToVerify, signature, documentId, bucketref, manager) => {
 
@@ -44,18 +45,28 @@ export default async function SignDocument(req, res, next){
         const { id:userId } = await getSession(JWTtoken,getClientIP(req))
         const [
             { documentprivateencryptedkey, documentpublickey:publicKey },
-            { applicant, manager,  documentsha }
+            { applicant, manager,  documentsha, applicantsignature, applicantpublickey }
         ] = await Promise.all([getUserById(userId), getDocument(docType, docId)])
-        console.log(documentprivateencryptedkey, publicKey, applicant, manager, "DATA");
 
+        console.log(documentsha, "Document sha");
+        
         // Check if the document has been altered
         if (documentsha && documentsha !== dataToVerify) 
-            return res.status(400).send("Document altered.");
+            return res.status(400).send({msg:"Document altered."});
 
         // Check if the user is allowed to sign the document
         if((userId !== applicant && userId !== manager) | (!documentprivateencryptedkey | !documentprivateencryptedkey))
             return res.status(403).send("Not allowed.");
 
+        if(userId === manager){
+           const isValid = await Cipher.RSAverifySignature(dataToVerify,applicantpublickey, applicantsignature)
+           console.log(isValid, "isValid",applicantpublickey, applicantsignature);
+           
+           if(!isValid){
+            return res.status(403).send({msg:"Compromised Signature."});
+           }
+            
+        }
         // Get signer RSA keys
         const privateKey = await Cipher.AES256decrypt(documentprivateencryptedkey.toString('utf-8'), userId)
         const signature = await Cipher.RSAsignDocument(privateKey, dataToVerify)
