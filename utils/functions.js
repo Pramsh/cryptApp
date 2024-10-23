@@ -1,4 +1,4 @@
-import { JWTexpirationTimeValue, IPheader } from "./constants.js";
+import { JWTexpirationTimeValue, IPheader, signDocumentsPermissions } from "./constants.js";
 export const isValidJSON = (str) => {
     if (typeof str !== 'string') return false;
     str = str.trim();
@@ -35,8 +35,29 @@ export const divideChunks = (arr, maxLength) => {
     return chunks;
   };
 
-  export const getClientIP = (req) => 
-    req.headers[IPheader].length ?
-        req.headers[IPheader].split(',')[0] :
-        req.connection.remoteAddress
-  
+export const getClientIP = (req) => 
+req.headers[IPheader].length ?
+    req.headers[IPheader].split(',')[0] :
+    req.connection.remoteAddress
+
+
+export const checkVariables = (variables, flowReference) => 
+    new Promise((resolve, reject) => {
+        const missingVariables = Object.entries(variables).filter(([key, value]) => value === undefined || value === null ||(typeof value === "string" && value.trim() === ''));
+        if (missingVariables.length > 0) {
+            const missingKeys = missingVariables.map(([key]) => key);
+            reject({
+                message: "Missing variables: " + missingKeys.join(', ') + " -- in flow: " + flowReference,
+                status: 400
+            });
+        } else {
+            resolve();
+        }
+    });
+
+
+export const hasSignDocumentsPermissions = (permission) =>
+    signDocumentsPermissions.some((perm) => perm === permission)
+
+export const timesExpired = (expiration, currentTime) => 
+    Math.floor((-1) * ( expiration - currentTime ) / JWTexpirationTimeValue) + 1
