@@ -12,6 +12,7 @@ import ValidateJWT from './middlewares/ValidateJWT.js'
 import Authenticate from './middlewares/Authenticate.js'
 import SignDocument from './middlewares/SignDocument.js'
 import { GetSessionMid } from './middlewares/GetSession.js'
+import VerifySignature from './middlewares/VerifySignature.js'
 //in partica gli altri server be saranno collegati a questo e passarenno gli header che verrann ocontrollati
 //se non vanno l'app schianta
 //quindi devo esporre un endpoint che valida solo gli header
@@ -46,6 +47,8 @@ router.post("/jwt/validate", ValidateJWT)
 router.post("/rsa-gen", RSA_Gen)
 
 router.post("/sign-doc", SignDocument)
+
+router.post("/verify-doc", VerifySignature)
 
 
 app.listen(port, () => {

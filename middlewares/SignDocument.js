@@ -47,8 +47,6 @@ export default async function SignDocument(req, res, next){
             { documentprivateencryptedkey, documentpublickey:publicKey },
             { applicant, manager,  documentsha, applicantsignature, applicantpublickey }
         ] = await Promise.all([getUserById(userId), getDocument(docType, docId)])
-
-        console.log(documentsha, "Document sha");
         
         // Check if the document has been altered
         if (documentsha && documentsha !== dataToVerify) 
@@ -58,9 +56,9 @@ export default async function SignDocument(req, res, next){
         if((userId !== applicant && userId !== manager) | (!documentprivateencryptedkey | !documentprivateencryptedkey))
             return res.status(403).send("Not allowed.");
 
+        // If it's manager, first verify the applicant signature
         if(userId === manager){
            const isValid = await Cipher.RSAverifySignature(dataToVerify,applicantpublickey, applicantsignature)
-           console.log(isValid, "isValid",applicantpublickey, applicantsignature);
            
            if(!isValid){
             return res.status(403).send({msg:"Compromised Signature."});
