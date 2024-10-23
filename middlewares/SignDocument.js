@@ -11,14 +11,12 @@ const storeSignedDocument = async(userId, type, applicant, publicKey, dataToVeri
     // Update RDA
     if( type.toLowerCase() === "rda"){
         if(userId === applicant){ // First sign
-            console.log("first sign");
             payload.applicantsignature=signature
             payload.applicantpublickey=publicKey
             payload.documentsha=dataToVerify
             await updateDocApplicantOrManagerSignature(documentId, payload, applicant)
             
         } else if(userId === manager){ // Second sign
-            console.log("second sign");
             payload.managersignature=signature
             payload.managerpublickey=publicKey
             payload.documentsha=dataToVerify
