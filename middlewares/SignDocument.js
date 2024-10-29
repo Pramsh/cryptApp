@@ -39,8 +39,9 @@ export default async function SignDocument(req, res, next){
             }
             //look the destructured params of the method below to undestand what arrives
         } = req.body
-
-        const { id:userId } = await getSession(JWTtoken,getClientIP(req))
+        
+        const { id:userId } = await getSession(JWTtoken,getClientIP(req))        
+        
         const [
             { documentprivateencryptedkey, documentpublickey:publicKey },
             { applicant, manager,  documentsha, applicantsignature, applicantpublickey }
@@ -55,20 +56,20 @@ export default async function SignDocument(req, res, next){
             return res.status(403).send("Not allowed.");
 
         // If it's manager, first verify the applicant signature
-        if(userId === manager){
+        if(userId === manager){            
            const isValid = await Cipher.RSAverifySignature(dataToVerify,applicantpublickey, applicantsignature)
-           
            if(!isValid){
             return res.status(403).send({msg:"Compromised Signature."});
            }
             
         }
+        
         // Get signer RSA keys
         const privateKey = await Cipher.AES256decrypt(documentprivateencryptedkey.toString('utf-8'), userId)
         const signature = await Cipher.RSAsignDocument(privateKey, dataToVerify)
-        await storeSignedDocument(userId, docType, applicant, publicKey, dataToVerify, signature, docId, bucketRef, manager )
+        await storeSignedDocument(userId, docType, applicant, publicKey, dataToVerify, signature, docId, bucketRef, manager )        
         res.status(200).send(true)
-    } catch (error) {
+    } catch (error) {        
         res.status(error?.status ?? 500).send(error.message ?? error)
     }
 }

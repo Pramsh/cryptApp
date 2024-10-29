@@ -8,9 +8,7 @@ export default async function ValidateJWT(req, res, next){
     try {
         const { jwt } = req.body
         const ip = getClientIP(req)
-        const session = await getSession(jwt,ip);
-        console.log(session,"session");
-        
+        const session = await getSession(jwt,ip);        
         const currentUserId = session.id;
         const { jwtpublickey, jwtprivateencryptedkey, email, role } = await getUserById(currentUserId);
         // const refreshedJwt = await Cipher.validateJWT(getClientIP(req), jwt)
@@ -33,7 +31,6 @@ export default async function ValidateJWT(req, res, next){
         }
 
         const currentTime = Math.floor(Date.now() / 1000);
-console.log(Math.sign(payload.exp - currentTime),timesExpired(payload.exp, currentTime),"payload",payload.exp- currentTime);
 
         // If expired more than 1 time
         if (Math.sign(payload.exp - currentTime) === -1 && timesExpired(payload.exp, currentTime) > 1) {

@@ -24,7 +24,7 @@ export default async function Test(req, res, next){
                     return res.json()
                 }).then(data => data)
             })).catch((E) => { 
-                console.log(E, "NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+                console.log(E, "err: "+ E?.message ?? JSON.stringify(E))
             })
          }
  
@@ -42,8 +42,6 @@ export default async function Test(req, res, next){
          }
         res.status(200).send("ok")
     } catch (error) {
-        console.log(error);
-        
         res.status(500).send("ko")
         
     }

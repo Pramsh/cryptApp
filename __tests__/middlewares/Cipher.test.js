@@ -95,7 +95,7 @@ describe("RSA", () => {
                 expect(typeof el).toBe('object');
                 rsa_genMockReq.body.userId = el.id
                 await RSA_Gen(rsa_genMockReq, rsa_genMockRes)
-                expect(rsa_genMockRes.send).toHaveBeenCalledWith("ok")
+                expect(rsa_genMockRes.send).toHaveBeenCalledWith({message:"ok"})
                 expect(rsa_genMockRes.status).toHaveBeenCalledWith(200)
             }
         })

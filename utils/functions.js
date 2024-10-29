@@ -35,10 +35,17 @@ export const divideChunks = (arr, maxLength) => {
     return chunks;
   };
 
-export const getClientIP = (req) => 
-req.headers[IPheader].length ?
-    req.headers[IPheader].split(',')[0] :
-    req.connection.remoteAddress
+export const getClientIP = (req) => {
+    try {        
+        return req.headers[IPheader].length ?
+            req.headers[IPheader].split(',')[0] :
+            req.connection.remoteAddress
+        
+    } catch (error) {
+        throw new Error("Missing headers, probably IP")
+    }
+
+}
 
 
 export const checkVariables = (variables, flowReference) => 

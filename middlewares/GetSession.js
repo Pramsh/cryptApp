@@ -2,7 +2,7 @@ import { getUserById } from "../lib/DB.js";
 import { getClientIP } from "../utils/functions.js";
 
 export const getSession = async (jwt,ip) => {
-    try {
+    try {       
         const { id: userId } = await Cipher.getSessionData(jwt);
         const user = await getUserById(userId);
         const isValid = await Cipher.validateJWT(ip,jwt, user.jwtpublickey);
